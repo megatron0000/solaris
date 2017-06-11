@@ -19,7 +19,7 @@ int servohLimitHigh = 170;
 int servohLimitLow = 15;
 Servo vertical;
 int servov = 20;
-int servovLimitHigh = 120;
+int servovLimitHigh = 140;
 int servovLimitLow = 20;
 
 int ldrld = A0;
@@ -34,7 +34,7 @@ float avd = 0;
 float avl = 0;
 float avr = 0;
 
-float tol = 20;
+float tol = 5;
 
 void setup()
 {
