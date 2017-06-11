@@ -1,12 +1,24 @@
 #include <Servo.h>
 
+/**
+ * Código oriundo de "sd-test"
+ */
+#include <SD.h>
+#include <SPI.h>
+#include "easySD.h"
+int CS_PIN = 10;
+String servohFile = "servoh.csv";
+String servovFile = "servov.csv";
+
+/**
+ * Continuação do código original de sensor-track
+ */
 Servo horizontal;
-int servoh = 90;
+int servoh = 15;
 int servohLimitHigh = 170;
 int servohLimitLow = 15;
-
 Servo vertical;
-int servov = 90;
+int servov = 20;
 int servovLimitHigh = 120;
 int servovLimitLow = 20;
 
@@ -22,29 +34,35 @@ float avd = 0;
 float avl = 0;
 float avr = 0;
 
-int tol = 2;
+float tol = 20;
 
 void setup()
 {
   Serial.begin(19200);
 
-  horizontal.attach(9);
-  vertical.attach(8);
+  /**
+   * Código de "sd-test"
+   */
+  initializeSD(CS_PIN);
+  
 
-  horizontal.write(90);
-  vertical.write(10);
+  horizontal.attach(8);
+  vertical.attach(9);
 
-  delay(5000);
+  horizontal.write(servoh);
+  vertical.write(servov);
+
+  delay(1000);
 }
 
 void loop() {
 
   if (cyclicTime != 0) {
 
-    int lt = analogRead(ldrlt);
-    int rt = analogRead(ldrrt);
-    int ld = analogRead(ldrld);
-    int rd = analogRead(ldrrd);
+    float lt = analogRead(ldrlt);
+    float rt = analogRead(ldrrt);
+    float ld = analogRead(ldrld);
+    float rd = analogRead(ldrrd);
 
     avt += (lt + rt) / 2;
     avd += (ld + rd) / 2;
@@ -74,6 +92,10 @@ void loop() {
     Serial.print(avl);
     Serial.print(" ");
     Serial.print(avr);
+    Serial.print(" ");
+    Serial.print(servov);
+    Serial.print(" ");
+    Serial.print(servoh);
     Serial.print("\n");
 
     if (abs(avt - avd) > tol) {
@@ -86,10 +108,16 @@ void loop() {
     }
 
     if (abs(avl - avr) > tol) {
+
+      int inverter = +1;
+      if (servov < 35) {
+        inverter = -1;
+      }
+      
       if (avr > avl) {
-        servoh = constrain(servoh + 1, servohLimitLow, servohLimitHigh);
+        servoh = constrain(servoh + floor(random(1,4))*inverter, servohLimitLow, servohLimitHigh);
       } else {
-        servoh = constrain(servoh - 1, servohLimitLow, servohLimitHigh);
+        servoh = constrain(servoh - floor(random(1,4))*inverter, servohLimitLow, servohLimitHigh);
       }
       horizontal.write(servoh);
     }
@@ -98,6 +126,8 @@ void loop() {
     avd = 0;
     avl = 0;
     avr = 0;
+
+    
 
     delay(50);
 
