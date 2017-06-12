@@ -10,6 +10,7 @@ void setup()
 
  Serial.println("Measuring voltage and current with INA219 ...");
  ina219.begin();
+ ina219.setCalibration_16V_400mA();
  Serial.println("ina219 began");
 }
 

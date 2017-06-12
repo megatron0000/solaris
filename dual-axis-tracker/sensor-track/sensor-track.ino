@@ -1,18 +1,4 @@
 #include <Servo.h>
-
-/**
- * Código oriundo de "sd-test"
- */
-#include <SD.h>
-#include <SPI.h>
-#include "easySD.h"
-int CS_PIN = 10;
-String servohFile = "servoh.csv";
-String servovFile = "servov.csv";
-
-/**
- * Continuação do código original de sensor-track
- */
 Servo horizontal;
 int servoh = 15;
 int servohLimitHigh = 170;
@@ -38,13 +24,7 @@ float tol = 5;
 
 void setup()
 {
-  Serial.begin(19200);
-
-  /**
-   * Código de "sd-test"
-   */
-  initializeSD(CS_PIN);
-  
+  Serial.begin(9600);
 
   horizontal.attach(8);
   vertical.attach(9);
@@ -109,15 +89,15 @@ void loop() {
 
     if (abs(avl - avr) > tol) {
 
-      int inverter = +1;
+      int reverse = +1;
       if (servov < 35) {
-        inverter = -1;
+        reverse = -1;
       }
       
       if (avr > avl) {
-        servoh = constrain(servoh + floor(random(1,4))*inverter, servohLimitLow, servohLimitHigh);
+        servoh = constrain(servoh + floor(random(1,4))*reverse, servohLimitLow, servohLimitHigh);
       } else {
-        servoh = constrain(servoh - floor(random(1,4))*inverter, servohLimitLow, servohLimitHigh);
+        servoh = constrain(servoh - floor(random(1,4))*reverse, servohLimitLow, servohLimitHigh);
       }
       horizontal.write(servoh);
     }
