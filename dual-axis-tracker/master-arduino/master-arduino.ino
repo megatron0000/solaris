@@ -29,7 +29,7 @@ DS3231 rtc(SDA, SCL);
 /**
    Sensor de corrente/tensão
 */
-Adafruit_INA219 ina219Master = Adafruit_INA219();
+Adafruit_INA219 ina219Master = Adafruit_INA219(0x41);
 Adafruit_INA219 ina219Slave = Adafruit_INA219(/** outro endereço */);
 
 /**
