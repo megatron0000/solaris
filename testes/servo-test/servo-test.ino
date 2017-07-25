@@ -8,7 +8,8 @@ void setup() {
   vertical.attach(9);
   horizontal.attach(8);
   delay(50);
-  vertical.write(36);
+  vertical.write(120);
+  horizontal.write(130);
 }
 
 void loop() {

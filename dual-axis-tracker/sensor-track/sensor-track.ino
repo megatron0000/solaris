@@ -1,12 +1,12 @@
 #include <Servo.h>
 Servo horizontal;
-int servoh = 15;
+int servoh = 90;
 int servohLimitHigh = 170;
 int servohLimitLow = 15;
 Servo vertical;
-int servov = 20;
+int servov = 110;
 int servovLimitHigh = 140;
-int servovLimitLow = 20;
+int servovLimitLow = 80;
 
 int ldrld = A0;
 int ldrrd = A1;
@@ -20,7 +20,7 @@ float avd = 0;
 float avl = 0;
 float avr = 0;
 
-float tol = 5;
+float tol = 1;
 
 void setup()
 {
@@ -49,21 +49,12 @@ void loop() {
     avl += (lt + ld) / 2;
     avr += (rt + rd) / 2;
 
-    //    Serial.print(avt);
-    //    Serial.print(" ");
-    //    Serial.print(avd);
-    //    Serial.print(" ");
-    //    Serial.print(avl);
-    //    Serial.print(" ");
-    //    Serial.print(avr);
-    //    Serial.print("\n");
-
   } else {
 
-    avt = avt / 100;
-    avd = avd / 100;
-    avl = avl / 100;
-    avr = avr / 100;
+    avt = avt / 60;
+    avd = avd / 60;
+    avl = avl / 60;
+    avr = avr / 60;
 
     Serial.print(avt);
     Serial.print(" ");
@@ -85,21 +76,23 @@ void loop() {
         servov = constrain(servov + 1, servovLimitLow, servovLimitHigh);
       }
       vertical.write(servov);
+      delay(50);
     }
 
     if (abs(avl - avr) > tol) {
 
       int reverse = +1;
-      if (servov < 35) {
+      if (servov < 90) {
         reverse = -1;
       }
       
       if (avr > avl) {
-        servoh = constrain(servoh + floor(random(1,4))*reverse, servohLimitLow, servohLimitHigh);
+        servoh = constrain(servoh + 1*reverse, servohLimitLow, servohLimitHigh);
       } else {
-        servoh = constrain(servoh - floor(random(1,4))*reverse, servohLimitLow, servohLimitHigh);
+        servoh = constrain(servoh - 1*reverse, servohLimitLow, servohLimitHigh);
       }
       horizontal.write(servoh);
+      delay(50);
     }
 
     avt = 0;
@@ -107,13 +100,11 @@ void loop() {
     avl = 0;
     avr = 0;
 
-    
-
     delay(50);
 
   }
 
-  cyclicTime = (cyclicTime + 1) % 100;
+  cyclicTime = (cyclicTime + 1) % 60;
 
 }
 

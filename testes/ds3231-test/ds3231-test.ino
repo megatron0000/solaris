@@ -14,9 +14,9 @@ void setup()
   Serial.println("Began");
 
   // The following lines can be uncommented to set the date and time
-  //  rtc.setDOW(SATURDAY);     // Set Day-of-Week to SUNDAY
-  //  rtc.setTime(15, 16, 0);     // Set the time to 12:00:00 (24hr format)
-  //  rtc.setDate(10, 6, 2017);   // Set the date to January 1st, 2014
+    rtc.setDOW(TUESDAY);     // Set Day-of-Week to SUNDAY
+    rtc.setTime(16, 40, 0);     // Set the time to 12:00:00 (24hr format)
+    rtc.setDate(27, 6, 2017);   // Set the date to January 1st, 2014
 
   Serial.println("Configured RTC");
 }

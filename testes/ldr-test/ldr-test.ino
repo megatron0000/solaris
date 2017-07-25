@@ -9,7 +9,7 @@ void setup() {
 
 void loop() {
   int ldrValues [4];
-  
+
   ldrValues[0] = analogRead(ldrlt);
   ldrValues[1] = analogRead(ldrrt);
   ldrValues[2] = analogRead(ldrld);
@@ -21,3 +21,4 @@ void loop() {
   }
   Serial.print("\n");
 }
+

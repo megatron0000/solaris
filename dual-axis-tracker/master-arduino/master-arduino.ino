@@ -5,6 +5,7 @@
 #include <DS3231.h>
 #include <Adafruit_INA219.h>
 #include <Servo.h>
+#include <stringParse.h>
 
 
 /**
@@ -30,7 +31,7 @@ DS3231 rtc(SDA, SCL);
    Sensor de corrente/tensão
 */
 Adafruit_INA219 ina219Master = Adafruit_INA219(0x41);
-Adafruit_INA219 ina219Slave = Adafruit_INA219(/** outro endereço */);
+Adafruit_INA219 ina219Slave = Adafruit_INA219();
 
 /**
    Servos
@@ -41,9 +42,9 @@ int servoh = 15;
 #define SERVOH_LIMIT_LOW 15
 
 Servo vertical;
-int servov = 20;
-#define SERVOV_LIMIT_HIGH 140
-#define SERVOV_LIMIT_LOW 20
+int servov = 60;
+#define SERVOV_LIMIT_HIGH 60
+#define SERVOV_LIMIT_LOW 10
 
 /**
    LDRs
@@ -63,6 +64,7 @@ float avr = 0;
 /**
    Contador
 */
+#define TIME_LENGTH 60
 int cyclicTime = 1; //otherwise first iteration would trigger servo move
 
 void setup() {
@@ -75,9 +77,12 @@ void setup() {
   
   rtc.begin();
   ina219Master.begin();
+  ina219Master.setCalibration_16V_400mA();
   ina219Slave.begin();
+  
   horizontal.attach(8);
   vertical.attach(9);
+
   horizontal.write(servoh);
   vertical.write(servov);
 
@@ -100,18 +105,18 @@ void loop() {
   concatString += String(ina219Slave.getBusVoltage_V() + (ina219Slave.getShuntVoltage_mV() / 1000)) + ",";
   concatString += String(ina219Slave.getCurrent_mA() * (ina219Slave.getBusVoltage_V() + (ina219Slave.getShuntVoltage_mV() / 1000)));
 
-  Serial.println(concatString);
+  Serial.println(ina219Master.getCurrent_mA());
 
   writeToFile(dataFile, concatString);
 
-  if (cyclicTime % 5 == 0) {
+  if (cyclicTime == 0 || cyclicTime == TIME_LENGTH/2) {
     closeFile(dataFile);
     dataFile = openFileWrite(DATA_FILE);
-    Serial.println("Data written to SD");
+    Serial.println(String(rtc.getTimeStr()) + " : Data written to SD");
   }
 
 
-  if (cyclicTime == 0) {
+  if (cyclicTime != 0) {
 
     for (int i = 1; i <= 100; i++) {
       float lt = analogRead(LDRLT);
@@ -139,9 +144,9 @@ void loop() {
     Serial.print(" ");
     Serial.print(avr);
     Serial.print(" ");
-    Serial.print(servov);
-    Serial.print(" ");
     Serial.print(servoh);
+    Serial.print(" ");
+    Serial.print(servov);
     Serial.print("\n");
 
     if (abs(avt - avd) > TOL) {
@@ -162,13 +167,14 @@ void loop() {
       }
 
       if (avr > avl) {
-        servoh = constrain(servoh + floor(random(1, 4)) * reverse, SERVOH_LIMIT_LOW, SERVOH_LIMIT_HIGH);
+        servoh = constrain(servoh + 1 * reverse, SERVOH_LIMIT_LOW, SERVOH_LIMIT_HIGH);
       } else {
-        servoh = constrain(servoh - floor(random(1, 4)) * reverse, SERVOH_LIMIT_LOW, SERVOH_LIMIT_HIGH);
+        servoh = constrain(servoh - 1 * reverse, SERVOH_LIMIT_LOW, SERVOH_LIMIT_HIGH);
       }
       horizontal.write(servoh);
       delay(100);
     }
+
 
     avt = 0;
     avd = 0;
@@ -177,7 +183,7 @@ void loop() {
 
   }
 
-  cyclicTime = (cyclicTime + 1) % 100;
+  cyclicTime = (cyclicTime + 1) % TIME_LENGTH;
 
   delay(1000);
 }
